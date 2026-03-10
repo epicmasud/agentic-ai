@@ -130,12 +130,3 @@ if run_button:
 
         st.balloons()
         st.success("All 3 agents completed their work!")
-```
-
---- 
-
-### 📄 File 2 — `requirements.txt`
-This tells Streamlit which libraries to install. **Create a new file** with exactly this content:
-```
-groq
-streamlit
