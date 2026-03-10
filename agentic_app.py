@@ -1,32 +1,22 @@
 import streamlit as st
 from groq import Groq
 
-# Page config
 st.set_page_config(
     page_title="AI News Agent",
     page_icon="📰",
     layout="centered"
 )
 
-# Title and description
 st.title("📰 AI News Agent")
 st.subheader("Powered by 3 AI Agents working together")
 st.markdown("Enter any topic and watch 3 AI agents research, write, and edit a news article for you!")
 
-# Sidebar for API key
-st.sidebar.title("⚙️ Settings")
-api_key = st.sidebar.text_input(
-    "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",
-    type="password",
-    placeholder="gsk_..."
-)
-st.sidebar.markdown("Get your free key at [console.groq.com](https://console.groq.com)")
+# Get API key from Streamlit secrets
+api_key = st.secrets["GROQ_API_KEY"]
 
-# Main input
 topic = st.text_input("Enter a news topic:", placeholder="e.g. Artificial Intelligence in 2025")
 run_button = st.button("🚀 Run AI Agents", use_container_width=True)
 
-# Agent functions
 def researcher_agent(client, topic):
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
@@ -98,30 +88,24 @@ def editor_agent(client, topic, article):
     return response.choices[0].message.content
 
 
-# Run agents when button is clicked
 if run_button:
-    if not api_key:
-        st.error("Please enter your Groq API key in the sidebar!")
-    elif not topic:
+    if not topic:
         st.error("Please enter a news topic!")
     else:
         client = Groq(api_key=api_key)
 
-        # Agent 1
         with st.expander("🕵️ Agent 1 - Researcher", expanded=True):
             with st.spinner("Researching..."):
                 research = researcher_agent(client, topic)
             st.success("Research Complete!")
             st.write(research)
 
-        # Agent 2
         with st.expander("✍️ Agent 2 - Journalist", expanded=True):
             with st.spinner("Writing article..."):
                 article = journalist_agent(client, topic, research)
             st.success("Article Written!")
             st.write(article)
 
-        # Agent 3
         with st.expander("🧐 Agent 3 - Editor", expanded=True):
             with st.spinner("Fact-checking and editing..."):
                 final = editor_agent(client, topic, article)
